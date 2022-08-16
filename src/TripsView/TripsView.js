@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Route, Link } from 'react-router-dom'
 import { getData } from '../apiCalls'
-import DayJS from 'react-dayjs';
+import dayjs from 'dayjs';
+import PastTrips from '../PastTrips/PastTrips';
 
 
 const TripsView = ({travelerID}) => {
   const [trips, setTrips] = useState([])
-  const [today, setToday] = useState('')
+  const [today, setDate] = useState('')
 
   useEffect(() => {
-    getData('	http://localhost:3001/api/v1/trips')
-      .then(data => setTrips(data))
+    getData('http://localhost:3001/api/v1/trips')
+      .then(data => {
+        setTrips(data)
+        setDate(dayjs().format("YYYY-MM-DD"))
+    })
   }, [])
 
-  const getToday = () => {
-    const todaysDate = new Date()
-    setToday(DayJS(todaysDate))
-  }
-
   const getPastTrips = () => {
-    const pastTrips = trips.filter(trip => {
-      console.log(trip)
-    })
-    return pastTrips
+    if (trips.length) {
+      const pastTrips = trips.filter(trip => {
+        if (trip.date < today && trip.userID === travelerID) {
+          return trip
+        }
+      }) 
+      return pastTrips
+    } 
   }
 
   return (
@@ -31,13 +34,16 @@ const TripsView = ({travelerID}) => {
         return (
           <div>
             <p>Your Travel Expenses in 2022:</p>
-            <Link to='/past-trips'>
+            <Link to='/trips/past-trips'>
               <button>Past Trips</button>
             </Link>
             <button>Future Trips</button>
           </div>
         )}}
       />
+      <Route exact path='/trips/past-trips' render={() => 
+        <PastTrips pastTrips={getPastTrips()}/>
+    } />
     </div>
   )
 }
