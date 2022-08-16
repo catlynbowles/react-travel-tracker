@@ -8,18 +8,11 @@ import Form from '../Form/Form'
 
 const App = () => {
   const [traveler, setTraveler] = useState([])
-  const [trips, setTrips] = useState([])
 
   useEffect(() => {
-    const travelerData =  getData('http://localhost:3001/api/v1/travelers/22')
-    const tripData = getData('	http://localhost:3001/api/v1/trips')
-
-    Promise.all([travelerData, tripData])
-      .then(data => {
-        setTraveler(data[0])
-        setTrips(data[1])
-      })
-  }, [])
+    getData('http://localhost:3001/api/v1/travelers/22')
+      .then(data => setTraveler(data))
+    }, [])
 
   return (
     <main className="App">
@@ -35,10 +28,13 @@ const App = () => {
         </div>
       }/>
       <Route exact path='/trips' render={() => 
-        <TripsView />
+        <TripsView travelerID={traveler.id}/>
       }/>
       <Route exact path='/book-trip' render={() => 
         <Form />
+      }/>
+      <Route exact path='/past-trips' render={() => 
+        <div>Past</div>
       }/>
     </main>
   );
